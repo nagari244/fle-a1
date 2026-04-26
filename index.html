@@ -6,30 +6,19 @@
     <title>L'Heure et la Journée - FLE A1</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        :root {
-            --clock-size: 260px;
-        }
-        @media (min-width: 768px) {
-            :root { --clock-size: 300px; }
-        }
+        :root { --clock-size: 260px; }
+        @media (min-width: 768px) { :root { --clock-size: 300px; } }
 
         .clock {
-            width: var(--clock-size);
-            height: var(--clock-size);
-            border: 8px solid #1e293b;
-            border-radius: 50%;
-            position: relative;
-            background: white;
-            margin: 20px auto;
+            width: var(--clock-size); height: var(--clock-size);
+            border: 8px solid #1e293b; border-radius: 50%;
+            position: relative; background: white; margin: 20px auto;
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
         }
 
         .hand {
-            position: absolute;
-            bottom: 50%;
-            left: 50%;
-            transform-origin: bottom;
-            border-radius: 10px;
+            position: absolute; bottom: 50%; left: 50%;
+            transform-origin: bottom; border-radius: 10px;
             transition: transform 0.5s cubic-bezier(0.4, 2.08, 0.55, 0.44);
         }
 
@@ -37,44 +26,26 @@
         .minute-hand { width: 4px; height: 40%; background: #64748b; margin-left: -2px; z-index: 2; }
         
         .center-dot {
-            position: absolute;
-            top: 50%; left: 50%;
-            width: 14px; height: 14px;
-            background: #ef4444; border-radius: 50%;
-            transform: translate(-50%, -50%);
-            z-index: 10;
+            position: absolute; top: 50%; left: 50%;
+            width: 14px; height: 14px; background: #ef4444; border-radius: 50%;
+            transform: translate(-50%, -50%); z-index: 10;
         }
 
         .number {
-            position: absolute;
-            font-weight: 800;
-            font-size: 1.2rem;
-            color: #1e293b;
-            transform: translate(-50%, -50%);
+            position: absolute; font-weight: 800; font-size: 1.2rem;
+            color: #1e293b; transform: translate(-50%, -50%);
         }
 
-        .clock-hidden {
-            filter: blur(25px) grayscale(1);
-            opacity: 0.2;
-            pointer-events: none;
-        }
+        .clock-hidden { filter: blur(25px) grayscale(1); opacity: 0.2; pointer-events: none; }
 
         .drop-zone {
-            min-height: 140px;
-            border: 2px dashed #cbd5e1;
-            border-radius: 1rem;
-            transition: all 0.3s ease;
-            background: #f8fafc;
+            min-height: 140px; border: 2px dashed #cbd5e1; border-radius: 1rem;
+            transition: all 0.3s ease; background: #f8fafc;
         }
         .drop-zone.over { border-color: #3b82f6; background: #eff6ff; }
 
-        input[type=range] {
-            accent-color: #3b82f6;
-        }
-
-        .verb-card {
-            transition: transform 0.2s, background-color 0.3s;
-        }
+        input[type=range] { accent-color: #3b82f6; }
+        .verb-card { transition: transform 0.2s, background-color 0.3s; }
         .verb-card:active { transform: scale(0.95); }
     </style>
 </head>
@@ -91,6 +62,7 @@
         <button onclick="switchMode('quiz')" class="px-5 py-2.5 bg-emerald-600 text-white rounded-full font-bold shadow-md hover:bg-emerald-700 transition">Quiz Visuel</button>
         <button onclick="switchMode('audio')" class="px-5 py-2.5 bg-rose-600 text-white rounded-full font-bold shadow-md hover:bg-rose-700 transition">Défi Auditif</button>
         <button onclick="switchMode('routine')" class="px-5 py-2.5 bg-amber-500 text-white rounded-full font-bold shadow-md hover:bg-amber-600 transition">Ma routine</button>
+        <button onclick="switchMode('report')" class="px-5 py-2.5 bg-slate-800 text-white rounded-full font-bold shadow-md hover:bg-black transition">Envoi Rapport</button>
     </nav>
 
     <main class="bg-white rounded-3xl shadow-xl border border-slate-100 p-6 md:p-10">
@@ -147,7 +119,10 @@
             <div id="quiz-results" class="hidden text-center p-10 bg-blue-50 rounded-3xl border-2 border-blue-100">
                 <h3 class="text-3xl font-black text-blue-900 mb-2">Terminé !</h3>
                 <p id="final-score-text" class="text-xl text-blue-700 font-bold mb-6"></p>
-                <button onclick="switchMode(currentMode)" class="px-8 py-3 bg-blue-600 text-white rounded-xl font-bold shadow-lg">Recommencer</button>
+                <div class="flex flex-col gap-3">
+                    <button onclick="switchMode(currentMode)" class="px-8 py-3 bg-blue-600 text-white rounded-xl font-bold shadow-lg">Recommencer le Quiz</button>
+                    <button onclick="switchMode('report')" class="px-8 py-3 bg-slate-800 text-white rounded-xl font-bold shadow-lg">Voir mon bilan final</button>
+                </div>
             </div>
         </div>
 
@@ -170,6 +145,30 @@
                 </div>
             </div>
         </div>
+
+        <!-- Section Rapport/Envoi -->
+        <div id="report-area" class="hidden max-w-md mx-auto">
+            <h2 class="text-2xl font-black text-slate-800 mb-6 text-center">Bilan de l'activité</h2>
+            <div class="bg-slate-50 p-6 rounded-2xl space-y-4 mb-6">
+                <div class="flex justify-between border-b pb-2">
+                    <span class="font-bold text-slate-500">Quiz Visuel :</span>
+                    <span id="rep-quiz-vis" class="font-black text-blue-600">--</span>
+                </div>
+                <div class="flex justify-between border-b pb-2">
+                    <span class="font-bold text-slate-500">Défi Auditif :</span>
+                    <span id="rep-quiz-aud" class="font-black text-rose-600">--</span>
+                </div>
+            </div>
+
+            <div class="space-y-4">
+                <label class="block text-sm font-bold text-slate-600 uppercase">Votre Nom et Prénom :</label>
+                <input type="text" id="student-name" placeholder="Ex: Jean Martin" class="w-full p-4 border-2 border-slate-200 rounded-2xl focus:border-blue-500 outline-none transition">
+                <button onclick="sendReport()" class="w-full py-4 bg-blue-600 text-white rounded-2xl font-bold shadow-lg hover:bg-blue-700 transition">
+                    ✉️ Envoyer mon bilan par e-mail
+                </button>
+                <p id="mail-feedback" class="text-xs text-center text-slate-400">Cela ouvrira votre application de messagerie par défaut.</p>
+            </div>
+        </div>
     </main>
 </div>
 
@@ -177,6 +176,10 @@
     let currentMode = 'learn';
     let targetHour = 10, targetMin = 0;
     let score = 0, rounds = 0;
+
+    // Variables de stockage global pour le rapport
+    let scoreVisual = null;
+    let scoreAudio = null;
 
     const verbs = [
         { id: 1, text: "Se lever", periods: ["morning"] },
@@ -201,11 +204,9 @@
     function speak(text) {
         if ('speechSynthesis' in window) {
             window.speechSynthesis.cancel();
-            // Ajout d'une virgule et espace pour stabiliser l'articulation du premier mot
             const msg = new SpeechSynthesisUtterance(", " + text);
             msg.lang = 'fr-FR';
             msg.rate = 0.8;
-            msg.pitch = 1;
             window.speechSynthesis.speak(msg);
         }
     }
@@ -220,9 +221,7 @@
         const size = clock.offsetWidth;
         const radius = (size / 2) - 30;
         const center = size / 2;
-
-        const existingNumbers = clock.querySelectorAll('.number');
-        existingNumbers.forEach(n => n.remove());
+        clock.querySelectorAll('.number').forEach(n => n.remove());
 
         for (let i = 1; i <= 12; i++) {
             const num = document.createElement('div');
@@ -236,45 +235,28 @@
     }
 
     function updateClock(h, m) {
-        const hourHand = document.getElementById('hour-hand');
-        const minuteHand = document.getElementById('minute-hand');
-        if (!hourHand || !minuteHand) return;
-        
         const hDeg = (h % 12) * 30 + (m / 60) * 30;
         const mDeg = m * 6;
-        hourHand.style.transform = `rotate(${hDeg}deg)`;
-        minuteHand.style.transform = `rotate(${mDeg}deg)`;
+        document.getElementById('hour-hand').style.transform = `rotate(${hDeg}deg)`;
+        document.getElementById('minute-hand').style.transform = `rotate(${mDeg}deg)`;
     }
 
     function numberToWords(h, m) {
         const hoursWords = ["minuit", "une heure", "deux heures", "trois heures", "quatre heures", "cinq heures", "six heures", "sept heures", "huit heures", "neuf heures", "dix heures", "onze heures", "midi", "treize heures", "quatorze heures", "quinze heures", "seize heures", "dix-sept heures", "dix-huit heures", "dix-neuf heures", "vingt heures", "vingt et une heures", "vingt-deux heures", "vingt-trois heures"];
-        
-        // Cas pile (00)
         if (m === 0) {
             if (h === 0) return "Il est minuit.";
             if (h === 12) return "Il est midi.";
             return `Il est ${hoursWords[h]}.`;
         }
-
-        // Minutes 1 à 30
         if (m <= 30) {
             let hText = (h === 0) ? "minuit" : (h === 12 ? "midi" : hoursWords[h]);
             if (m === 15) return `Il est ${hText} et quart.`;
             if (m === 30) return `Il est ${hText} et demie.`;
             return `Il est ${hText} ${m}.`;
-        } 
-        
-        // Minutes 31 à 59 (Système "Moins")
-        else {
+        } else {
             const nextH = (h + 1) % 24;
             const diff = 60 - m;
-            
-            // Correction spécifique demandée : Midi 50 -> Treize heures moins dix
-            let hText;
-            if (nextH === 0) hText = "minuit";
-            else if (nextH === 12) hText = "midi";
-            else hText = hoursWords[nextH];
-            
+            let hText = (nextH === 0) ? "minuit" : (nextH === 12 ? "midi" : hoursWords[nextH]);
             if (diff === 15) return `Il est ${hText} moins le quart.`;
             if (diff === 1) return `Il est ${hText} moins une.`;
             return `Il est ${hText} moins ${diff}.`;
@@ -282,33 +264,22 @@
     }
 
     function updateFromSliders() {
-        const hSlider = document.getElementById('hour-slider');
-        const mSlider = document.getElementById('minute-slider');
-        if (!hSlider || !mSlider) return;
-
-        targetHour = parseInt(hSlider.value);
-        targetMin = parseInt(mSlider.value);
-        
-        const hVal = document.getElementById('hour-val');
-        const mVal = document.getElementById('min-val');
-        if (hVal) hVal.innerText = targetHour + 'h';
-        if (mVal) mVal.innerText = targetMin < 10 ? '0' + targetMin : targetMin;
-        
+        targetHour = parseInt(document.getElementById('hour-slider').value);
+        targetMin = parseInt(document.getElementById('minute-slider').value);
+        document.getElementById('hour-val').innerText = targetHour + 'h';
+        document.getElementById('min-val').innerText = targetMin < 10 ? '0' + targetMin : targetMin;
         updateClock(targetHour, targetMin);
-        const textDisplay = document.getElementById('time-text-display');
-        if (textDisplay) textDisplay.innerText = numberToWords(targetHour, targetMin);
+        document.getElementById('time-text-display').innerText = numberToWords(targetHour, targetMin);
     }
 
     function switchMode(mode) {
         currentMode = mode;
-        rounds = 0; score = 0;
+        // On ne reset score et rounds QUE si ce sont les modes quiz, sinon on perd les données
+        if(mode === 'quiz' || mode === 'audio') { rounds = 0; score = 0; }
         
-        document.getElementById('learn-controls').classList.add('hidden');
-        document.getElementById('quiz-area').classList.add('hidden');
-        document.getElementById('routine-area').classList.add('hidden');
+        ['learn-controls', 'quiz-area', 'routine-area', 'report-area'].forEach(id => document.getElementById(id).classList.add('hidden'));
         document.getElementById('quiz-content').classList.remove('hidden');
         document.getElementById('quiz-results').classList.add('hidden');
-        
         document.getElementById('main-clock').classList.remove('clock-hidden');
         document.getElementById('audio-visual-cue').classList.add('hidden');
         document.getElementById('time-text-display').classList.remove('hidden');
@@ -327,15 +298,15 @@
             document.getElementById('display-container').classList.add('hidden');
             document.getElementById('routine-area').classList.remove('hidden');
             initRoutineGame();
+        } else if (mode === 'report') {
+            document.getElementById('display-container').classList.add('hidden');
+            document.getElementById('report-area').classList.remove('hidden');
+            updateReportDisplay();
         }
     }
 
     function generateNewRound() {
-        if (rounds >= 10) {
-            showFinalScore();
-            return;
-        }
-        
+        if (rounds >= 10) { showFinalScore(); return; }
         targetHour = Math.floor(Math.random() * 24);
         targetMin = [0, 15, 30, 45, 10, 20, 40, 50][Math.floor(Math.random() * 8)];
         updateClock(targetHour, targetMin);
@@ -346,9 +317,7 @@
         document.getElementById('time-text-display').innerText = "";
         
         const rawPhrase = numberToWords(targetHour, targetMin).replace('.', '').trim();
-        const correct = isAudio ? 
-            `${targetHour.toString().padStart(2, '0')}:${targetMin.toString().padStart(2, '0')}` : 
-            rawPhrase;
+        const correct = isAudio ? `${targetHour.toString().padStart(2, '0')}:${targetMin.toString().padStart(2, '0')}` : rawPhrase;
 
         const options = [correct];
         while (options.length < 4) {
@@ -379,7 +348,6 @@
         document.getElementById('main-clock').classList.remove('clock-hidden');
         document.getElementById('audio-visual-cue').classList.add('hidden');
         document.getElementById('time-text-display').innerText = numberToWords(targetHour, targetMin);
-        
         rounds++;
         f.classList.remove('hidden');
         if (selected === correct) {
@@ -390,52 +358,63 @@
             f.className = "mt-6 p-4 rounded-2xl bg-rose-100 text-rose-700 font-bold text-center";
             f.innerText = `Faux ! La réponse était : ${correct}`;
         }
-        
         document.getElementById('next-btn').classList.remove('hidden');
         document.querySelectorAll('#quiz-options button').forEach(b => b.disabled = true);
     }
 
     function showFinalScore() {
-        document.getElementById('quiz-content').classList.add('hidden');
-        const resultsArea = document.getElementById('quiz-results');
-        const scoreText = document.getElementById('final-score-text');
+        if(currentMode === 'quiz') scoreVisual = `${score}/10`;
+        if(currentMode === 'audio') scoreAudio = `${score}/10`;
         
-        scoreText.innerText = `Score : ${score} / 10`;
-        resultsArea.classList.remove('hidden');
+        document.getElementById('quiz-content').classList.add('hidden');
+        document.getElementById('final-score-text').innerText = `Score : ${score} / 10`;
+        document.getElementById('quiz-results').classList.remove('hidden');
+    }
+
+    function updateReportDisplay() {
+        document.getElementById('rep-quiz-vis').innerText = scoreVisual || "Non complété";
+        document.getElementById('rep-quiz-aud').innerText = scoreAudio || "Non complété";
+    }
+
+    function sendReport() {
+        const name = document.getElementById('student-name').value.trim();
+        if (!name) {
+            alert("Veuillez entrer votre nom avant d'envoyer le rapport.");
+            return;
+        }
+
+        const email = "naguilarneri@gmail.com";
+        const subject = `Bilan FLE L'Heure - ${name}`;
+        const body = `Bonjour Nadia,\n\nVoici mon bilan d'activité :\n\n` +
+                     `Étudiant(e) : ${name}\n` +
+                     `Quiz Visuel : ${scoreVisual || "N/A"}\n` +
+                     `Défi Auditif : ${scoreAudio || "N/A"}\n\n` +
+                     `Cordialement.`;
+
+        const mailtoLink = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+        window.location.href = mailtoLink;
     }
 
     function initRoutineGame() {
         const bank = document.getElementById('verbs-bank');
         bank.innerHTML = '';
-        ['morning-zone', 'afternoon-zone', 'evening-zone'].forEach(id => {
-            const zone = document.getElementById(id);
-            if (zone) zone.innerHTML = '';
-        });
+        ['morning-zone', 'afternoon-zone', 'evening-zone'].forEach(id => document.getElementById(id).innerHTML = '');
         
         [...verbs].sort(() => Math.random() - 0.5).forEach(v => {
             const el = document.createElement('div');
             el.className = "verb-card bg-white border-2 border-slate-200 px-4 py-2 rounded-xl shadow-sm text-sm font-bold cursor-grab active:cursor-grabbing hover:border-blue-400 transition";
             el.innerText = v.text;
-            el.draggable = true;
-            el.id = `verb-${v.id}`;
-            el.dataset.id = v.id;
-            el.addEventListener('dragstart', (e) => {
-                e.dataTransfer.setData('verbId', v.id);
-                speak(v.text);
-            });
+            el.draggable = true; el.id = `verb-${v.id}`;
+            el.addEventListener('dragstart', (e) => { e.dataTransfer.setData('verbId', v.id); speak(v.text); });
             bank.appendChild(el);
         });
 
         document.querySelectorAll('.drop-zone').forEach(zone => {
-            zone.addEventListener('dragover', (e) => {
-                e.preventDefault();
-                zone.classList.add('over');
-            });
+            zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('over'); });
             zone.addEventListener('dragleave', () => zone.classList.remove('over'));
-            zone.addEventListener('drop', (e) => {
+            zone.addEventListener('drop', e => {
                 zone.classList.remove('over');
-                const verbId = e.dataTransfer.getData('verbId');
-                handleVerbPlacement(verbId, zone);
+                handleVerbPlacement(e.dataTransfer.getData('verbId'), zone);
             });
         });
     }
@@ -460,10 +439,7 @@
         }
     }
 
-    window.onload = () => {
-        createClockNumbers();
-        switchMode('learn');
-    };
+    window.onload = () => { createClockNumbers(); switchMode('learn'); };
 </script>
 
 </body>
